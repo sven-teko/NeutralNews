@@ -1,13 +1,21 @@
 from flask import Flask, render_template
-import rss_client
+from feeds import feeds_bp
 
-app = Flask(__name__, template_folder="web")
+# Templates liegen in "web", statische Assets (styles.css, news.js) ebenso.
+app = Flask(
+    __name__,
+    template_folder="web",
+    static_folder="web",
+    static_url_path="/static",
+)
 
+# API-Blueprint registrieren
+app.register_blueprint(feeds_bp)
+
+# Startseite: rendert index.html; Inhalte lädt das Frontend über /api/feeds
 @app.route("/")
 def index():
-    left  = rss_client.fetch("nzz", limit=10)
-    right = rss_client.fetch("spiegel", limit=10)
-    return render_template("index.html", left_items=left, right_items=right)
+    return render_template("index.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
