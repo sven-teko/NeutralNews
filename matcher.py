@@ -9,20 +9,20 @@ from datetime import datetime
 # Wortschätze
 
 STOPWORDS = {
-    # de
+    # deusch
     "der","die","das","und","oder","nicht","mit","von","im","in","am","an","auf","für","aus",
     "den","dem","des","ein","eine","einer","eines","einem","einen","zu","zum","zur","über",
     "noch","sich","so","als","bei","nach","vor","bis","wir","ihr","sie","er","es","man",
     "auch","mehr","weniger","gegen","weil","dass","da","beim","ohne",
     "wird","werden","hat","haben","sei","sind","war","waren","kann","können","müssen","muss",
     "soll","sollen","sollte","sollten","immer","heute","morgen","gestern",
-    # en
+    # englisch
     "the","a","an","and","or","of","to","in","on","for","by","with","from","as","at","is","are",
     "be","was","were","this","that","these","those","it","its","into","about","over","under",
     "more","new","must","should","can","could","would","today","yesterday","tomorrow"
 }
 
-# generische Wörter (für Matching ignorieren)
+# generische Wörter
 WEAK_TOKENS = {
     "regierung","bund","amt","behörde","beamte","behörden","menschen","leute",
     "jahr","jahre","kommentar","bericht","berichte","video","fotos","bilder",
@@ -33,16 +33,16 @@ WEAK_TOKENS = {
     "verspricht","hilfe","hilft","neuartig","angebot","blick","hintergrund","bericht"
 }
 
-# generische Tags (zählen NICHT als Tag-Overlap)
+# generische Tags
 WEAK_TAGS = {
     "politik","wirtschaft","kultur","sport","wissen","wissenschaft","gesundheit",
     "inland","ausland","panorama","welt","schweiz","deutschland","meinung","analyse",
     "news","nachrichten"
 }
 
-# Anchor-/Topic-Keywords (kanonisiert) – Kernthemen/Orte/Organisationen
+# Kernthemen
 ANCHOR_TOKENS = {
-    # Geo/Org
+    # Länder
     "ukraine","russland","usa","vereinigte-staaten","kalifornien",
     "israel","gaza","westjordanland","palästina","nato","uno","vereinte-nationen",
     "eu","europa","frankreich","spanien","italien","polen","iran","irak","syrien","china",
@@ -51,30 +51,30 @@ ANCHOR_TOKENS = {
     "alzheimer","demenz","depression","postpartum","krebs","covid","corona","grippe"
 }
 
-# Kontextwörter – „zweites“ präzises Wort neben Ankern
+# Kontextwörter
 CONTEXT_TOKENS = {
-    # Krieg/Konflikt
+    # Krieg/Konflikte
     "krieg","invasion","front","offensive","angriff","angriffe","rakete","drohne","militär",
     "waffe","waffen","panzer","soldat","soldaten","gefecht","bombardierung",
     "geisel","geiseln","terror","hamas","hisbollah",
-    # Politik/Diplomatie/Regeln
+    # Politik
     "wahl","wahlen","regierung","parlament","gesetz","gesetze","visa","visum","diplomatie",
     "sanktion","sanktionen","resolution","gerichtsentscheid","urteil",
-    # Gesundheit/Medizin (spezifischer)
+    # Gesundheit
     "medikament","therapie","impfung","klinisch","neuro","diagnose","frühstadium","symptom","symptome"
 }
 
 WORD_RE = re.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ0-9]+", re.UNICODE)
 
-# Schwellwerte – „balanced“
-BASE_THR = 0.12          # Score-Schwelle (Recall-orientiert, aber nicht zu weich)
-REQUIRE_STRONG_MIN = 2   # mind. 2 starke Overlaps (wenn keine Tags)
-NEAR_DATE_DAYS = 10      # milde Datumsstrafe ab >10 Tagen
+# Schwellwerte
+BASE_THR = 0.12         
+REQUIRE_STRONG_MIN = 2  
+NEAR_DATE_DAYS = 10  
 
-# Kanonisierung / Synonyme
+#  Synonyme
 
 CANON_MAP = {
-    # UNO/UN
+    # UN
     "un":"uno", "uno":"uno",
     "vereinte":"vereinte-nationen", "vereinten":"vereinte-nationen",
     "vereinte-nationen":"vereinte-nationen", "vereinten-nationen":"vereinte-nationen",
@@ -85,14 +85,14 @@ CANON_MAP = {
     "vereinigte":"vereinigte-staaten","staaten":"vereinigte-staaten",
     "vereinigte-staaten":"vereinigte-staaten",
 
-    # Gaza / Westjordanland
+    # Gaza
     "gaza":"gaza", "gazastreifen":"gaza",
     "westjordanland":"westjordanland","cisjordanien":"westjordanland","west-bank":"westjordanland",
 
     # Städte
     "new":"new-york","york":"new-york","new-york":"new-york",
 
-    # EU / Europa
+    # Europa
     "eu":"eu","europa":"europa",
 
     # UK
@@ -208,7 +208,7 @@ def _topic_label(left_items: List[Dict[str, Any]], right_items: List[Dict[str, A
             nice.append(cands[0] if cands else key)
         return " / ".join(nice)
 
-    # 2) Fallback
+    # Fallback
     items = (left_items or []) + (right_items or [])
     if items:
         items_sorted = sorted(items, key=lambda it: (len(it.get("title","")), -len(it.get("summary",""))))
@@ -217,7 +217,7 @@ def _topic_label(left_items: List[Dict[str, Any]], right_items: List[Dict[str, A
             return t
     return "Thema"
 
-# Ähnlichkeit + Gate
+# Ähnlichkeit
 
 def _similarity(li: Dict[str,Any], rj: Dict[str,Any], tag_bonus: float) -> Tuple[float, bool]:
     can_l, can_strong_l = li["can_all"], li["can_strong"]
@@ -230,13 +230,13 @@ def _similarity(li: Dict[str,Any], rj: Dict[str,Any], tag_bonus: float) -> Tuple
     anchors_r = can_strong_r & ANCHOR_TOKENS
     anchor_overlap = anchors_l & anchors_r
 
-    # Score über starke Tokens + evtl. Tag-Bonus
+    # Tokens
     base = _jaccard_recall(can_strong_l, can_strong_r)
     tags_overlap = bool(li["tags"] & rj["tags"])
     score = base + (tag_bonus if tags_overlap else 0.0)
     score = max(0.0, score - _date_penalty(li["item"], rj["item"]))
 
-    # --- strenges, aber balanciertes Gate ---
+    #  Gate
     gate_ok = (
         tags_overlap or
         (len(strong_overlap) >= REQUIRE_STRONG_MIN) or
@@ -245,7 +245,7 @@ def _similarity(li: Dict[str,Any], rj: Dict[str,Any], tag_bonus: float) -> Tuple
 
     return score, gate_ok
 
-# ------------------------------ Hauptlogik -----------------------------------
+#  Hauptlogik
 
 def match_pairs(
     left: List[Dict[str, Any]],
@@ -254,7 +254,6 @@ def match_pairs(
     jaccard_threshold: float = BASE_THR,
     tag_bonus: float = 0.35,
 ) -> List[Dict[str, Any]]:
-    # Precompute
     L = []
     for i, it in enumerate(left):
         ca, cs = _item_tokens(it)
@@ -270,7 +269,7 @@ def match_pairs(
     unmatched_left: List[Dict[str, Any]] = []
     unmatched_right = set(range(len(R)))
 
-    # Greedy Paarbildung mit Gate
+    # Paarbildung mit Gate
     for li in L:
         best_j = None
         best_score = 0.0
@@ -295,7 +294,7 @@ def match_pairs(
         else:
             unmatched_left.append(li["item"])
 
-    # Unmatched nur bei gleichem Gate einsortieren
+    # unpassende nur bei gleichem Gate einsortieren
     def _fits_group(it: Dict[str, Any], grp: Dict[str, Any]) -> bool:
         g_tags: Set[str] = set()
         g_all: Set[str] = set()
@@ -333,7 +332,7 @@ def match_pairs(
         if not placed:
             groups.append({"topic": _topic_label([], [it]), "left": [], "right": [it]})
 
-    # Finale Labels + Sortierung
+    # Finale Sortierung
     for grp in groups:
         grp["topic"] = _topic_label(grp["left"], grp["right"])
 

@@ -44,7 +44,7 @@ def api_feeds():
     limit     = int(request.args.get("limit", "20"))
     q         = (request.args.get("q") or "").strip() or None
 
-    # optional: Ähnlichkeitsschwelle justierbar
+    # Ähnlichkeitsschwelle
     try:
         thr = float(request.args.get("thr", "0.20"))  # vorher: "0.28"
     except ValueError:
@@ -58,11 +58,11 @@ def api_feeds():
     except Exception as e:
         return jsonify({"ok": False, "error": f"fetch failed: {e}"}), 502
 
-    # Optionaler Volltext-Filter
+    # Filter
     left_f  = _apply_query(left_items, q)
     right_f = _apply_query(right_items, q)
 
-    # Paarbildung / Gruppierung
+    # Paarbildung
     groups = matcher.match_pairs(left_f, right_f, jaccard_threshold=thr)
 
     return jsonify({

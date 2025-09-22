@@ -13,7 +13,7 @@ body{
   color:#eaf0f6;
 }
 
-/* Primitives */
+/* Rahmen */
 .glass{
   background:var(--nn-glass-bg);
   backdrop-filter:blur(6px);
@@ -27,7 +27,7 @@ body{
 .hero{padding:2.25rem}
 @media (min-width:992px){.hero{padding:3rem}}
 
-/* Skeleton */
+/* UI Skelett */
 .skeleton{
   position:relative;overflow:hidden;
   background:rgba(255,255,255,.08);
@@ -42,7 +42,7 @@ body{
 @keyframes shimmer{to{transform:translateX(100%)}}
 @media (prefers-reduced-motion:reduce){.skeleton::after{animation:none}}
 
-/* Filterchips */
+/* Filter */
 .topic-chip{
   border:1px solid var(--nn-border);
   background:rgba(255,255,255,.02);
@@ -52,7 +52,7 @@ body{
   border-color:rgba(88,101,242,.5);
 }
 
-/* Cards & Articles */
+/* Artikel */
 .topic-card,
 .group-article{
   transition:transform .12s ease, box-shadow .12s ease;
@@ -64,5 +64,5 @@ body{
 .group-link{text-decoration:none}
 .group-link:hover{text-decoration:underline}
 
-/* Footer */
+/* Fusszeile */
 footer{border-top:1px solid var(--nn-border)}
