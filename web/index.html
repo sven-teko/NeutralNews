@@ -4,59 +4,58 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NeutralNews – Themenvergleich</title>
-
-  <!-- Fonts & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-  <!-- App styles -->
   <link href="/static/styles.css" rel="stylesheet">
+  <style>
+    /* ---- fixes ---- */
+    /* make stretched-link work on both columns */
+    .topic-card article { position: relative; }
+    /* avoid any accidental clipping/truncation of words like "Jugend" */
+    .topic-card .group-title,
+    .topic-card .group-link,
+    .topic-card .group-summary { overflow: visible; text-overflow: clip; white-space: normal; letter-spacing: normal; hyphens: auto; word-break: break-word; }
+
+    /* better focus visibility */
+    a:focus-visible, button:focus-visible, .topic-chip:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: 2px; border-radius: .5rem; }
+
+    /* subtle borders for inputs in dark mode */
+    .input-group .form-control, .input-group-text { border-color: rgba(255,255,255,.25); }
+
+    /* small cosmetic helpers */
+    .glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; }
+    .brand { font-weight: 700; }
+  </style>
 </head>
 <body class="text-light d-flex flex-column">
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-md sticky-top glass mt-3 container-xxl shadow-sm">
+
+  <nav class="navbar navbar-expand-md navbar-dark mt-3 container-xxl">
     <div class="container-fluid px-3">
-      <a class="navbar-brand d-flex align-items-center gap-2 brand" href="#">
-        <i class="bi bi-broadcast-pin"></i>
-        <span>NeutralNews</span>
-      </a>
-
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Menü öffnen">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
+      <a class="navbar-brand d-flex align-items-center gap-2 brand" href="#"><i class="bi bi-broadcast-pin"></i>NeutralNews</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Navigation umschalten"><span class="navbar-toggler-icon"></span></button>
       <div class="collapse navbar-collapse" id="navMain">
         <div class="ms-md-auto d-flex align-items-center gap-2 mt-3 mt-md-0">
           <div class="input-group">
-            <span class="input-group-text bg-transparent text-secondary border-end-0"><i class="bi bi-search" aria-hidden="true"></i></span>
-            <input id="search" type="search" class="form-control bg-transparent border-start-0" placeholder="Themen oder Schlagwörter suchen…" aria-label="Suche">
+            <span class="input-group-text bg-transparent border-end-0" id="search-label"><i class="bi bi-search" aria-hidden="true"></i></span>
+            <input id="search" type="search" class="form-control bg-transparent border-start-0" placeholder="Suchen…" aria-labelledby="search-label" autocomplete="off">
+            <button id="clearSearch" class="btn btn-outline-light" type="button" title="Suche löschen" aria-label="Suche löschen"><i class="bi bi-x-lg"></i></button>
           </div>
-          <button id="refresh" class="btn btn-outline-light" title="Neu laden" aria-label="Neu laden" type="button"><i class="bi bi-arrow-repeat"></i></button>
-          <!-- Theme-Toggle entfernt -->
+          <button id="refresh" class="btn btn-outline-light" type="button" title="Neu laden" aria-label="Neu laden"><i class="bi bi-arrow-repeat"></i></button>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Hero / Intro -->
   <header class="container-xxl mt-4">
-    <div class="hero glass">
-      <div class="row align-items-center gy-3">
+    <div class="p-3 glass">
+      <div class="row align-items-center gy-2">
         <div class="col-lg-8">
-          <h1 class="h2 h1-lg mb-2 brand">Themenvergleich auf einen Blick</h1>
-          <p class="text-secondary mb-0">
-            Hier kannst du sehen, wie verschiedene Nachrichtenquellen über ein Thema berichten.
-            Nutze die Suche und die Filter, um passende Artikel zu finden.
-          </p>
+          <h1 class="h4 brand mb-2">Themenvergleich auf einen Blick</h1>
+          <p class="text-secondary mb-0">Suche und filtere, um passende Artikel zu finden.</p>
         </div>
-        <div class="col-lg-4 text-lg-end">
-          <div class="d-flex flex-wrap gap-2 justify-content-lg-end" role="tablist" aria-label="Themenfilter">
-            <button class="btn btn-sm topic-chip rounded-pill px-3 active" data-topic="alle" type="button" aria-current="true">Alle</button>
+        <div class="col-lg-4">
+          <div id="topicBar" class="d-flex flex-wrap gap-2 justify-content-lg-end">
+            <button class="btn btn-sm topic-chip rounded-pill px-3 active" data-topic="alle" type="button">Alle</button>
             <button class="btn btn-sm topic-chip rounded-pill px-3" data-topic="politik" type="button">Politik</button>
             <button class="btn btn-sm topic-chip rounded-pill px-3" data-topic="wirtschaft" type="button">Wirtschaft</button>
             <button class="btn btn-sm topic-chip rounded-pill px-3" data-topic="technologie" type="button">Technologie</button>
@@ -67,36 +66,35 @@
     </div>
   </header>
 
-  <!-- Main content -->
-  <main class="container-xxl flex-grow-1 my-4">
-    <!-- Group template -->
+  <main class="container-xxl my-4 flex-grow-1">
+    <!-- SR status for screen readers -->
+    <div id="sr-status" class="visually-hidden" aria-live="polite"></div>
+
     <template id="tpl-group">
       <div class="col-12">
-        <section class="glass p-3 p-md-4 topic-card">
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-            <h2 class="h5 mb-0 brand group-title">Stichwort</h2>
-            <span class="badge text-bg-secondary-subtle text-secondary-emphasis">Themenvergleich</span>
+        <section class="glass p-3 topic-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h6 mb-0 group-title">Thema</h2>
+            <span class="badge text-bg-secondary-subtle text-secondary-emphasis">Vergleich</span>
           </div>
-          <div class="row g-3 align-items-stretch">
-            <!-- SRF -->
+          <div class="row g-2">
             <div class="col-12 col-lg-6">
-              <article class="h-100 p-3 border rounded-3 bg-body bg-opacity-25 group-article" data-source="srf">
-                <div class="d-flex align-items-center gap-2 mb-2">
+              <article class="p-3 border rounded-3 bg-body bg-opacity-25" data-source="srf">
+                <div class="d-flex align-items-center gap-2 mb-1">
                   <span class="badge rounded-pill text-bg-primary-subtle text-primary-emphasis">SRF</span>
                   <time class="text-secondary small group-time"></time>
                 </div>
-                <a class="stretched-link group-link fw-semibold"></a>
+                <a class="stretched-link group-link fw-semibold" target="_blank" rel="noopener noreferrer"></a>
                 <p class="mb-0 text-secondary group-summary"></p>
               </article>
             </div>
-            <!-- Tagesschau -->
             <div class="col-12 col-lg-6">
-              <article class="h-100 p-3 border rounded-3 bg-body bg-opacity-25 group-article" data-source="tagesschau">
-                <div class="d-flex align-items-center gap-2 mb-2">
+              <article class="p-3 border rounded-3 bg-body bg-opacity-25" data-source="tagesschau">
+                <div class="d-flex align-items-center gap-2 mb-1">
                   <span class="badge rounded-pill text-bg-success-subtle text-success-emphasis">Tagesschau</span>
                   <time class="text-secondary small group-time"></time>
                 </div>
-                <a class="stretched-link group-link fw-semibold"></a>
+                <a class="stretched-link group-link fw-semibold" target="_blank" rel="noopener noreferrer"></a>
                 <p class="mb-0 text-secondary group-summary"></p>
               </article>
             </div>
@@ -106,166 +104,91 @@
     </template>
 
     <div id="groups" class="row g-3">
-      <!-- Placeholder -->
-      <div class="col-12">
-        <div class="glass p-3 topic-card">
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <span class="badge text-bg-secondary-subtle text-secondary-emphasis">Lade…</span>
-            <div class="spinner-border spinner-border-sm text-secondary" role="status" aria-hidden="true"></div>
-          </div>
-          <div class="skeleton" style="height: 18px; width: 50%; margin-bottom: .6rem;"></div>
-          <div class="skeleton" style="height: 14px; width: 92%; margin-bottom: .4rem;"></div>
-          <div class="skeleton" style="height: 14px; width: 87%; margin-bottom: .4rem;"></div>
-          <div class="skeleton" style="height: 14px; width: 60%;"></div>
-        </div>
-      </div>
+      <div class="col-12"><div class="glass p-3"><span class="text-secondary">Lade…</span></div></div>
     </div>
   </main>
 
-  <!-- Toast -->
-  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
-    <div id="liveToast" class="toast text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header bg-transparent text-secondary border-0">
-        <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
-        <strong class="me-auto">Hinweis</strong>
-        <small>Jetzt</small>
-        <button type="button" class="btn-close btn-close-white ms-2 mb-1" data-bs-dismiss="toast" aria-label="Schließen"></button>
-      </div>
-      <div class="toast-body">Willkommen bei NeutralNews!</div>
-    </div>
-  </div>
-
-  <!-- Footer -->
   <footer class="container-xxl glass mt-auto mb-3">
     <div class="d-flex flex-wrap justify-content-between align-items-center px-3 py-2 small text-secondary">
       <span>© <span id="year"></span> NeutralNews</span>
-      <div class="d-flex gap-3">
-        <a href="#" class="link-secondary">Impressum</a>
-        <a href="#" class="link-secondary">Datenschutz</a>
-      </div>
+      <div class="d-flex gap-3"></div>
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
   <script>
-    // Refresh
-    document.getElementById('refresh')?.addEventListener('click', () => location.reload());
+    const $ = s => document.querySelector(s);
+    const state = { groups: [], topic: 'alle', q: '' };
+    const fmt = d => { try { return new Date(d).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'});} catch { return ''; } };
 
-    // Jahr
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Einmal-Toast
-    (function(){
-      if (sessionStorage.getItem('nn-welcomed')) return;
-      sessionStorage.setItem('nn-welcomed', '1');
-      const toastEl = document.getElementById('liveToast');
-      if (!toastEl) return;
-      const toast = new bootstrap.Toast(toastEl, { delay: 2500 });
-      toast.show();
-    })();
-
-    // Topic-Chips
-    document.querySelectorAll('.topic-chip').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.topic-chip').forEach(b => {
-          b.classList.remove('active');
-          b.removeAttribute('aria-current');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-current', 'true');
-        const topic = btn.getAttribute('data-topic');
-        window.dispatchEvent(new CustomEvent('nn:topic-change', { detail: { topic } }));
-      });
+    // basic UI
+    $('#year').textContent = new Date().getFullYear();
+    $('#refresh')?.addEventListener('click', () => location.reload());
+    $('#clearSearch')?.addEventListener('click', () => { $('#search').value = ''; state.q = ''; apply(); $('#search').focus(); });
+    $('#search')?.addEventListener('keydown', e => { if(e.key === 'Escape'){ $('#clearSearch').click(); } });
+    $('#topicBar')?.addEventListener('click', e => {
+      const b = e.target.closest('.topic-chip'); if(!b) return;
+      $('.topic-chip.active')?.classList.remove('active'); b.classList.add('active');
+      document.dispatchEvent(new CustomEvent('nn:topic-change', { detail:{ topic: b.dataset.topic || 'alle' } }));
     });
+    let t; $('#search')?.addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { state.q = e.target.value || ''; apply(); }, 200); });
 
-    // --- Rendering & State ---
-    const state = { allGroups: [], query: '', topic: 'alle' };
-    const searchInput = document.getElementById('search');
-
-    function fmtDate(d){
-      try{ return new Date(d).toLocaleString(undefined,{ dateStyle:'medium', timeStyle:'short'}); }
-      catch{ return ''; }
-    }
-    function getActiveTopic(){
-      return document.querySelector('.topic-chip.active')?.getAttribute('data-topic') || 'alle';
-    }
-    function renderGroups(groups){
-      const wrap = document.getElementById('groups');
-      const tpl = document.getElementById('tpl-group');
-      if(!wrap || !tpl) return;
+    function render(list){
+      const wrap = $('#groups'), tpl = $('#tpl-group'); if(!wrap||!tpl) return;
       wrap.innerHTML = '';
-      groups.forEach(g => {
+      if(!list.length){ wrap.innerHTML = '<div class="col-12"><div class="glass p-3"><span class="text-secondary">Keine Treffer.</span></div></div>'; $('#sr-status').textContent = 'Keine Treffer.'; return; }
+      const frag = document.createDocumentFragment();
+      list.forEach(g => {
         const node = tpl.content.cloneNode(true);
         node.querySelector('.group-title').textContent = g.keyword || 'Thema';
-        const srf = node.querySelector('[data-source="srf"]');
-        if (g.srf){
-          const a = srf.querySelector('.group-link');
-          a.textContent = g.srf.title || 'Zum Beitrag';
-          a.href = g.srf.url || '#';
-          a.target = "_blank"; a.rel = "noopener noreferrer";
-          srf.querySelector('.group-summary').textContent = g.srf.summary || '';
-          srf.querySelector('.group-time').textContent = g.srf.date ? fmtDate(g.srf.date) : '';
-        }
-        const ts = node.querySelector('[data-source="tagesschau"]');
-        if (g.tagesschau){
-          const a = ts.querySelector('.group-link');
-          a.textContent = g.tagesschau.title || 'Zum Beitrag';
-          a.href = g.tagesschau.url || '#';
-          a.target = "_blank"; a.rel = "noopener noreferrer";
-          ts.querySelector('.group-summary').textContent = g.tagesschau.summary || '';
-          ts.querySelector('.group-time').textContent = g.tagesschau.date ? fmtDate(g.tagesschau.date) : '';
-        }
-        wrap.appendChild(node);
+        const fill = (sel, item) => {
+          const root = node.querySelector(sel); if(!root) return;
+          const a = root.querySelector('.group-link');
+          if(item){
+            a.textContent = item.title || 'Zum Beitrag';
+            a.href = item.url || '#';
+            root.querySelector('.group-summary').textContent = item.summary || '';
+            root.querySelector('.group-time').textContent = item.date ? fmt(item.date) : '';
+          } else {
+            a.textContent = 'Kein passender Beitrag';
+            a.removeAttribute('href');
+            a.classList.remove('stretched-link');
+            root.querySelector('.group-summary').textContent = '';
+            root.querySelector('.group-time').textContent = '';
+          }
+        };
+        fill('[data-source="srf"]', g.srf);
+        fill('[data-source="tagesschau"]', g.tagesschau);
+        frag.appendChild(node);
       });
+      wrap.appendChild(frag);
+      $('#sr-status').textContent = list.length + ' Themenblöcke angezeigt.';
     }
-    function applyFilters(){
-      const q = state.query.toLowerCase();
-      const topic = state.topic;
-      let list = state.allGroups;
-      if (topic && topic !== 'alle'){
-        list = list.filter(g => (g.topic || 'alle') === topic);
-      }
-      if (q){
-        list = list.filter(g =>
-          (g.keyword || '').toLowerCase().includes(q) ||
-          (g.srf?.title || '').toLowerCase().includes(q) ||
-          (g.srf?.summary || '').toLowerCase().includes(q) ||
-          (g.tagesschau?.title || '').toLowerCase().includes(q) ||
-          (g.tagesschau?.summary || '').toLowerCase().includes(q)
-        );
-      }
-      renderGroups(list);
-    }
-    function debounce(fn, delay=200){
-      let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
-    }
-    const onSearch = debounce(() => {
-      state.query = searchInput?.value || '';
-      applyFilters();
-    }, 220);
-    searchInput?.addEventListener('input', onSearch);
 
-    window.addEventListener('nn:topic-change', (ev) => {
-      state.topic = ev?.detail?.topic || getActiveTopic();
-      applyFilters();
-    });
-    window.addEventListener('nn:data', (e) => {
-      if (e?.detail?.groups && Array.isArray(e.detail.groups)) {
-        state.allGroups = e.detail.groups;
-        state.topic = getActiveTopic();
-        state.query = searchInput?.value || '';
-        applyFilters(); // sofort rendern!
-      }
-    });
-    if (Array.isArray(window.NN_GROUPS) && window.NN_GROUPS.length){
-      state.allGroups = window.NN_GROUPS;
-      applyFilters();
+    function apply(){
+      const q = state.q.toLowerCase();
+      let list = state.groups;
+      if(state.topic !== 'alle') list = list.filter(g => (g.topic || 'alle') === state.topic);
+      if(q) list = list.filter(g =>
+        (g.keyword || '').toLowerCase().includes(q) ||
+        (g.srf?.title || '').toLowerCase().includes(q) ||
+        (g.srf?.summary || '').toLowerCase().includes(q) ||
+        (g.tagesschau?.title || '').toLowerCase().includes(q) ||
+        (g.tagesschau?.summary || '').toLowerCase().includes(q)
+      );
+      render(list);
     }
-    window.dispatchEvent(new CustomEvent('nn:request-data'));
+
+    // events (nur document – dein news.js feuert auf window UND document)
+    document.addEventListener('nn:data', e => {
+      if (Array.isArray(e?.detail?.groups)) { state.groups = e.detail.groups; apply(); }
+    });
+    document.addEventListener('nn:topic-change', e => { state.topic = e?.detail?.topic || 'alle'; apply(); });
+
+    // Fallback, falls schon vorab gesetzt
+    if (Array.isArray(window.NN_GROUPS) && window.NN_GROUPS.length){ state.groups = window.NN_GROUPS; apply(); }
   </script>
 
-  <!-- Dein Loader -->
-  <script src="/static/news.js"></script>
+  <script src="/static/news.js" defer></script>
 </body>
 </html>

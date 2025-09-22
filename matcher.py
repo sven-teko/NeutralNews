@@ -1,9 +1,3 @@
-# matcher.py
-# Themen-genaues Matching mit Synonym-/Alias-Kanonisierung.
-# Gate-Regeln (mind. eine Bedingung muss erfüllt sein):
-#   A) spezifische Tags überlappen
-#   B) >=2 starke gemeinsame Keywords
-#   C) gemeinsamer Anchor (Land/Org/Thema) UND (>=1 Kontext-Overlap ODER >=2 weitere starke Keywords)
 
 from __future__ import annotations
 from typing import Dict, List, Any, Set, Tuple
@@ -12,7 +6,7 @@ import unicodedata
 from collections import Counter
 from datetime import datetime
 
-# ------------------ Wortschätze ------------------
+# Wortschätze
 
 STOPWORDS = {
     # de
@@ -77,7 +71,7 @@ BASE_THR = 0.12          # Score-Schwelle (Recall-orientiert, aber nicht zu weic
 REQUIRE_STRONG_MIN = 2   # mind. 2 starke Overlaps (wenn keine Tags)
 NEAR_DATE_DAYS = 10      # milde Datumsstrafe ab >10 Tagen
 
-# ------------------ Kanonisierung / Synonyme ------------------
+# Kanonisierung / Synonyme
 
 CANON_MAP = {
     # UNO/UN
@@ -141,7 +135,7 @@ def _canon_token(w: str) -> str:
 def _canon_set(words: Set[str]) -> Set[str]:
     return { _canon_token(w) for w in words }
 
-# ------------------ Tokenisierung ------------------
+# Tokenisierung
 
 def _tokens(*parts: str) -> Set[str]:
     bag: Set[str] = set()
@@ -177,7 +171,7 @@ def _item_tokens(item: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
     strong = _strong_tokens(tokens)
     return _canon_set(tokens), _canon_set(strong)  # (canon_all, canon_strong)
 
-# ------------------ Datum ------------------
+#  Datum
 
 def _parse_date(s: str) -> datetime | None:
     try:
@@ -195,10 +189,10 @@ def _date_penalty(a: Dict[str,Any], b: Dict[str,Any]) -> float:
         return 0.0
     return min(0.08, 0.01 * (delta - NEAR_DATE_DAYS))
 
-# ------------------ Topic-Label ------------------
+#  Topic-Label
 
 def _topic_label(left_items: List[Dict[str, Any]], right_items: List[Dict[str, Any]]) -> str:
-    # 1) gemeinsame (spezifische) Tags
+    # gemeinsame Tags
     tag_counter = Counter()
     orig = []
     for it in left_items + right_items:
@@ -214,7 +208,7 @@ def _topic_label(left_items: List[Dict[str, Any]], right_items: List[Dict[str, A
             nice.append(cands[0] if cands else key)
         return " / ".join(nice)
 
-    # 2) Fallback: kompakter echter Titel
+    # 2) Fallback
     items = (left_items or []) + (right_items or [])
     if items:
         items_sorted = sorted(items, key=lambda it: (len(it.get("title","")), -len(it.get("summary",""))))
@@ -223,7 +217,7 @@ def _topic_label(left_items: List[Dict[str, Any]], right_items: List[Dict[str, A
             return t
     return "Thema"
 
-# ------------------ Ähnlichkeit + Gate ------------------
+# Ähnlichkeit + Gate
 
 def _similarity(li: Dict[str,Any], rj: Dict[str,Any], tag_bonus: float) -> Tuple[float, bool]:
     can_l, can_strong_l = li["can_all"], li["can_strong"]
