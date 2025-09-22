@@ -16,12 +16,18 @@ NeutralNews hilft, Themen über mehrere Quellen hinweg zu vergleichen. Ein Thema
 * **Themen-Filter**: Schnellfilter (nicht fertig implementiert)
 * **Benutzerfreundliche UI**: mit Flask realisiert
 
-## 3) Systemvoraussetzungen
+## 3) Bugs
 
-  * Python ≥ 3.10 (einfacher lokaler Server)
+* **Laden der Inhalte**: Damit die Beiträge geladen werden muss man momentan immer noch zusätzlich auf "alle" klicken, ansonsten werden keine Artikel geladen
+* **Filter**: Die buttons für Filter Politik, Kultur usw. funktionieren noch nicht, wurden aber im aktuellen release beibehalten
+
+
+## 4) Systemvoraussetzungen
+
+  * Python 3
 
 ---
 
-## 4) Download & Installation
+## 5) Download & Installation
 
 **[Download (Releases‑Tab)](https://github.com/sven-teko/NeutralNews)**
