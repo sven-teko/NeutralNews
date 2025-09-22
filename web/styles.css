@@ -1,52 +1,68 @@
-body { 
-  background:#0b0c10; 
-  color:#eaf0f6; 
+/* Theme variables & base */
+:root {
+  --nn-glass-bg: rgba(255,255,255,.04);
+  --nn-border: rgba(255,255,255,.12);
 }
 
-.brand { 
-  font-weight:800; 
-  letter-spacing:.5px; 
+html, body { height: 100%; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  background:
+    radial-gradient(1200px 600px at 0% -10%, rgba(88,101,242,.18), transparent 60%),
+    radial-gradient(1200px 600px at 100% 110%, rgba(0,200,255,.16), transparent 60%),
+    #0b0d12;
 }
 
-.colwrap { 
-  display:grid; 
-  grid-template-columns: 1fr 1fr; 
-  gap:1rem; 
+/* Glass containers */
+.glass {
+  background: var(--nn-glass-bg);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--nn-border);
+  border-radius: 18px;
 }
 
-.card { 
-  background:#12141a; 
-  border:1px solid #1f2330; 
-  overflow:hidden;
+/* Branding */
+.brand { letter-spacing: .3px; font-weight: 700; }
+.brand i { opacity: .9; }
+
+/* Hero spacing */
+.hero { padding: 2.25rem; }
+@media (min-width: 992px){ .hero { padding: 3rem; } }
+
+/* Skeleton shimmer */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,.08);
+  border-radius: .75rem;
+}
+.skeleton::after{
+  content:"";
+  position:absolute; inset:0;
+  transform:translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce){
+  .skeleton::after{ animation: none; }
 }
 
-.badge { 
-  background:#0d6efd; 
-  font-weight:600; 
-}
+/* Topic chips */
+.topic-chip { border:1px solid var(--nn-border); background:rgba(255,255,255,.02); }
+.topic-chip.active { background:rgba(88,101,242,.18); border-color:rgba(88,101,242,.5); }
 
-.img-fit { 
-  width:100%; 
-  height:200px; 
-  object-fit:cover; 
-  display:block; 
-  border-radius:.5rem; 
-}
+/* Cards */
+.topic-card { transition: transform .12s ease, box-shadow .12s ease; }
+.topic-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
 
-a { 
-  color:#8ab4ff; 
-  text-decoration:none; 
-}
+/* Group articles */
+.group-article { position: relative; transition: transform .12s ease, box-shadow .12s ease; }
+.group-article:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.28); }
+.group-title { font-weight: 700; }
+.group-link { text-decoration: none; }
+.group-link:hover { text-decoration: underline; }
 
-a:hover { 
-  text-decoration:underline; 
-}
-
-section + section { 
-  border-top:1px solid #1f2330; 
-  padding-top:1rem; 
-}
-
-@media (max-width: 992px){ 
-  .colwrap{ grid-template-columns: 1fr; } 
-}
+/* Footer */
+footer { border-top:1px solid var(--nn-border); }
