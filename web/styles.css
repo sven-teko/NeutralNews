@@ -12,6 +12,7 @@ body {
     radial-gradient(1200px 600px at 0% -10%, rgba(88,101,242,.18), transparent 60%),
     radial-gradient(1200px 600px at 100% 110%, rgba(0,200,255,.16), transparent 60%),
     #0b0d12;
+  color: #eaf0f6;
 }
 
 /* Glass containers */
@@ -23,7 +24,10 @@ body {
 }
 
 /* Branding */
-.brand { letter-spacing: .3px; font-weight: 700; }
+.brand { 
+  letter-spacing: .3px; 
+  font-weight: 700; 
+}
 .brand i { opacity: .9; }
 
 /* Hero spacing */
@@ -50,16 +54,33 @@ body {
 }
 
 /* Topic chips */
-.topic-chip { border:1px solid var(--nn-border); background:rgba(255,255,255,.02); }
-.topic-chip.active { background:rgba(88,101,242,.18); border-color:rgba(88,101,242,.5); }
+.topic-chip { 
+  border:1px solid var(--nn-border); 
+  background:rgba(255,255,255,.02); 
+}
+.topic-chip.active { 
+  background:rgba(88,101,242,.18); 
+  border-color:rgba(88,101,242,.5); 
+}
 
 /* Cards */
-.topic-card { transition: transform .12s ease, box-shadow .12s ease; }
-.topic-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+.topic-card { 
+  transition: transform .12s ease, box-shadow .12s ease; 
+}
+.topic-card:hover { 
+  transform: translateY(-2px); 
+  box-shadow: 0 8px 24px rgba(0,0,0,.35); 
+}
 
 /* Group articles */
-.group-article { position: relative; transition: transform .12s ease, box-shadow .12s ease; }
-.group-article:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.28); }
+.group-article { 
+  position: relative; 
+  transition: transform .12s ease, box-shadow .12s ease; 
+}
+.group-article:hover { 
+  transform: translateY(-1px); 
+  box-shadow: 0 10px 24px rgba(0,0,0,.28); 
+}
 .group-title { font-weight: 700; }
 .group-link { text-decoration: none; }
 .group-link:hover { text-decoration: underline; }

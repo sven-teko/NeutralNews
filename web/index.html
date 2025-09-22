@@ -37,7 +37,7 @@
             <input id="search" type="search" class="form-control bg-transparent border-start-0" placeholder="Themen oder Schlagwörter suchen…" aria-label="Suche">
           </div>
           <button id="refresh" class="btn btn-outline-light" title="Neu laden" aria-label="Neu laden" type="button"><i class="bi bi-arrow-repeat"></i></button>
-          <button id="themeToggle" class="btn btn-light" title="Theme umschalten" aria-label="Theme umschalten" type="button"><i class="bi bi-moon-stars"></i></button>
+          <!-- Theme-Toggle entfernt -->
         </div>
       </div>
     </div>
@@ -49,7 +49,10 @@
       <div class="row align-items-center gy-3">
         <div class="col-lg-8">
           <h1 class="h2 h1-lg mb-2 brand">Themenvergleich auf einen Blick</h1>
-          <p class="text-secondary mb-0">Vergleiche, wie verschiedene Medien über dasselbe Thema berichten. Filtere, suche und entdecke neue Perspektiven.</p>
+          <p class="text-secondary mb-0">
+            Hier kannst du sehen, wie verschiedene Nachrichtenquellen über ein Thema berichten.
+            Nutze die Suche und die Filter, um passende Artikel zu finden.
+          </p>
         </div>
         <div class="col-lg-4 text-lg-end">
           <div class="d-flex flex-wrap gap-2 justify-content-lg-end" role="tablist" aria-label="Themenfilter">
@@ -66,7 +69,7 @@
 
   <!-- Main content -->
   <main class="container-xxl flex-grow-1 my-4">
-    <!-- Group template (used by news.js or inline renderer) -->
+    <!-- Group template -->
     <template id="tpl-group">
       <div class="col-12">
         <section class="glass p-3 p-md-4 topic-card">
@@ -103,7 +106,7 @@
     </template>
 
     <div id="groups" class="row g-3">
-      <!-- Placeholder while loading -->
+      <!-- Placeholder -->
       <div class="col-12">
         <div class="glass p-3 topic-card">
           <div class="d-flex align-items-center gap-2 mb-2">
@@ -119,7 +122,7 @@
     </div>
   </main>
 
-  <!-- Toast area (for non-blocking notices) -->
+  <!-- Toast -->
   <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
     <div id="liveToast" class="toast text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header bg-transparent text-secondary border-0">
@@ -146,26 +149,13 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Persisted theme toggle (dark/light)
-    (function(){
-      const root = document.documentElement;
-      const saved = localStorage.getItem('nn-theme');
-      if (saved) root.setAttribute('data-bs-theme', saved);
-      document.getElementById('themeToggle')?.addEventListener('click', () => {
-        const current = root.getAttribute('data-bs-theme') || 'dark';
-        const next = current === 'dark' ? 'light' : 'dark';
-        root.setAttribute('data-bs-theme', next);
-        localStorage.setItem('nn-theme', next);
-      });
-    })();
-
-    // Refresh button
+    // Refresh
     document.getElementById('refresh')?.addEventListener('click', () => location.reload());
 
-    // Current year
+    // Jahr
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Optional: show welcome toast once per session
+    // Einmal-Toast
     (function(){
       if (sessionStorage.getItem('nn-welcomed')) return;
       sessionStorage.setItem('nn-welcomed', '1');
@@ -175,7 +165,7 @@
       toast.show();
     })();
 
-    // Topic chips
+    // Topic-Chips
     document.querySelectorAll('.topic-chip').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.topic-chip').forEach(b => {
@@ -189,9 +179,17 @@
       });
     });
 
-    // In-page renderer
-    function fmtDate(d){ try{ return new Date(d).toLocaleString(undefined,{ dateStyle:'medium', timeStyle:'short'});}catch{ return ''; } }
+    // --- Rendering & State ---
+    const state = { allGroups: [], query: '', topic: 'alle' };
+    const searchInput = document.getElementById('search');
 
+    function fmtDate(d){
+      try{ return new Date(d).toLocaleString(undefined,{ dateStyle:'medium', timeStyle:'short'}); }
+      catch{ return ''; }
+    }
+    function getActiveTopic(){
+      return document.querySelector('.topic-chip.active')?.getAttribute('data-topic') || 'alle';
+    }
     function renderGroups(groups){
       const wrap = document.getElementById('groups');
       const tpl = document.getElementById('tpl-group');
@@ -200,63 +198,74 @@
       groups.forEach(g => {
         const node = tpl.content.cloneNode(true);
         node.querySelector('.group-title').textContent = g.keyword || 'Thema';
-
-        // SRF
         const srf = node.querySelector('[data-source="srf"]');
         if (g.srf){
           const a = srf.querySelector('.group-link');
           a.textContent = g.srf.title || 'Zum Beitrag';
-          a.setAttribute('href', g.srf.url || '#');
-          a.setAttribute('target', '_blank');
-          a.setAttribute('rel', 'noopener noreferrer');
+          a.href = g.srf.url || '#';
+          a.target = "_blank"; a.rel = "noopener noreferrer";
           srf.querySelector('.group-summary').textContent = g.srf.summary || '';
           srf.querySelector('.group-time').textContent = g.srf.date ? fmtDate(g.srf.date) : '';
         }
-
-        // Tagesschau
         const ts = node.querySelector('[data-source="tagesschau"]');
         if (g.tagesschau){
           const a = ts.querySelector('.group-link');
           a.textContent = g.tagesschau.title || 'Zum Beitrag';
-          a.setAttribute('href', g.tagesschau.url || '#');
-          a.setAttribute('target', '_blank');
-          a.setAttribute('rel', 'noopener noreferrer');
+          a.href = g.tagesschau.url || '#';
+          a.target = "_blank"; a.rel = "noopener noreferrer";
           ts.querySelector('.group-summary').textContent = g.tagesschau.summary || '';
           ts.querySelector('.group-time').textContent = g.tagesschau.date ? fmtDate(g.tagesschau.date) : '';
         }
-
         wrap.appendChild(node);
       });
     }
-
-    // Listen for data from loader
-    window.addEventListener('nn:data', (e) => {
-      if (e?.detail?.groups) { renderGroups(e.detail.groups); lastData = e.detail.groups; }
-    });
-
-    // Search + topic filter (client-side)
-    const searchInput = document.getElementById('search');
-    let lastData = [];
-    searchInput?.addEventListener('input', () => {
-      const q = searchInput.value.trim().toLowerCase();
-      if(!lastData.length){ return; }
-      const filtered = q ? lastData.filter(g =>
-        (g.keyword || '').toLowerCase().includes(q) ||
-        (g.srf?.title || '').toLowerCase().includes(q) ||
-        (g.tagesschau?.title || '').toLowerCase().includes(q)
-      ) : lastData;
-      renderGroups(filtered);
-    });
+    function applyFilters(){
+      const q = state.query.toLowerCase();
+      const topic = state.topic;
+      let list = state.allGroups;
+      if (topic && topic !== 'alle'){
+        list = list.filter(g => (g.topic || 'alle') === topic);
+      }
+      if (q){
+        list = list.filter(g =>
+          (g.keyword || '').toLowerCase().includes(q) ||
+          (g.srf?.title || '').toLowerCase().includes(q) ||
+          (g.srf?.summary || '').toLowerCase().includes(q) ||
+          (g.tagesschau?.title || '').toLowerCase().includes(q) ||
+          (g.tagesschau?.summary || '').toLowerCase().includes(q)
+        );
+      }
+      renderGroups(list);
+    }
+    function debounce(fn, delay=200){
+      let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+    }
+    const onSearch = debounce(() => {
+      state.query = searchInput?.value || '';
+      applyFilters();
+    }, 220);
+    searchInput?.addEventListener('input', onSearch);
 
     window.addEventListener('nn:topic-change', (ev) => {
-      const topic = ev?.detail?.topic;
-      if(!lastData.length || !topic || topic === 'alle'){ renderGroups(lastData); return; }
-      const filtered = lastData.filter(g => (g.topic || 'alle') === topic);
-      renderGroups(filtered);
+      state.topic = ev?.detail?.topic || getActiveTopic();
+      applyFilters();
     });
+    window.addEventListener('nn:data', (e) => {
+      if (e?.detail?.groups && Array.isArray(e.detail.groups)) {
+        state.allGroups = e.detail.groups;
+        state.topic = getActiveTopic();
+        state.query = searchInput?.value || '';
+        applyFilters(); // sofort rendern!
+      }
+    });
+    if (Array.isArray(window.NN_GROUPS) && window.NN_GROUPS.length){
+      state.allGroups = window.NN_GROUPS;
+      applyFilters();
+    }
+    window.dispatchEvent(new CustomEvent('nn:request-data'));
   </script>
 
-  <!-- Your app logic (should dispatch nn:data) -->
+  <!-- Dein Loader -->
   <script src="/static/news.js"></script>
 </body>
 </html>
