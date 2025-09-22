@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from feeds import feeds_bp
 
-# Templates liegen in "web", statische Assets (styles.css, news.js) ebenso.
+# Templates
 app = Flask(
     __name__,
     template_folder="web",
@@ -9,10 +9,10 @@ app = Flask(
     static_url_path="/static",
 )
 
-# API-Blueprint registrieren
+# API registrieren
 app.register_blueprint(feeds_bp)
 
-# Startseite: rendert index.html; Inhalte lädt das Frontend über /api/feeds
+# Startseite
 @app.route("/")
 def index():
     return render_template("index.html")

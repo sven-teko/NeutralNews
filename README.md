@@ -22,12 +22,15 @@ NeutralNews hilft, Themen über mehrere Quellen hinweg zu vergleichen. Ein Thema
 * **Filter**: Die buttons für Filter Politik, Kultur usw. funktionieren noch nicht, wurden aber im aktuellen release beibehalten
 
 
-## 4) Systemvoraussetzungen
+## 4) Nutzung & Vorraussetzungen
 
-  * Python 3
+  * Python 3 muss installiser sein.
+  * Flask muss in Python installiert sein. Falls dies nicht der Fall ist, sollte das Skript dieses allerdings automatisch herunterladen.
+  
+  1. Main.py ausführen
+  2. http://127.0.0.1:5000 lokal im browser öffnen.
+  3. Sicherheitshalber einmal aktualisieren. DIe Beiträge sollten angezeigt werden.
 
----
-
-## 5) Download & Installation
+## 5) Download
 
 **[Download (Releases‑Tab)](https://github.com/sven-teko/NeutralNews)**

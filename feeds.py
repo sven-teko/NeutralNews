@@ -22,23 +22,6 @@ def _apply_query(items, q: str | None):
 
 @feeds_bp.get("/api/feeds")
 def api_feeds():
-    """
-    Liefert thematische Gruppen aus zwei Feeds.
-    Query-Parameter:
-      - left (default: 'srf')
-      - right (default: 'tagesschau')
-      - limit (default: 20)
-      - q (optional Volltext-Filter über Titel, Summary, Tags, Quelle)
-      - thr (optional Float für Jaccard-Schwelle, default 0.28)
-    Response:
-      {
-        ok: true,
-        meta: { left_key, right_key, count_left, count_right, groups },
-        data: {
-          groups: [ { topic, left: [...], right: [...] }, ... ]
-        }
-      }
-    """
     left_key  = request.args.get("left", "srf").strip().lower()
     right_key = request.args.get("right", "tagesschau").strip().lower()
     limit     = int(request.args.get("limit", "20"))
@@ -81,9 +64,6 @@ def api_feeds():
 
 @feeds_bp.get("/api/health")
 def health():
-    """
-    Kleine Gesundheits-/Smoke-Check-Route, jetzt inkl. Gruppenzahl.
-    """
     try:
         l = rss_client.fetch("srf", limit=6)
         r = rss_client.fetch("tagesschau", limit=6)

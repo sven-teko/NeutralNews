@@ -1,5 +1,3 @@
-# rss_client.py
-# RSS-Client mit Extraktion von Titel, Summary(als Klartext), Link, Datum, Tags und Bildern.
 from datetime import datetime
 from html import unescape
 from html.parser import HTMLParser
@@ -12,8 +10,8 @@ TIMEOUT = 12
 FEEDS = {
     "nzz":        ("NZZ",        "https://www.nzz.ch/recent.rss"),
     "spiegel":    ("Spiegel",    "https://www.spiegel.de/schlagzeilen/index.rss"),
-    "srf":        ("SRF",        "https://www.srf.ch/news/bnf/rss/1646"),   # Beispiel
-    "tagesschau": ("Tagesschau", "https://www.tagesschau.de/xml/rss2"),     # Beispiel
+    "srf":        ("SRF",        "https://www.srf.ch/news/bnf/rss/1646"),   
+    "tagesschau": ("Tagesschau", "https://www.tagesschau.de/xml/rss2"), 
 }
 
 def _fetch(url:str)->bytes:
@@ -45,7 +43,7 @@ def _tags(e):
             tags.append(unescape(label))
     return tags
 
-# ------- HTML -> Klartext + Bild aus summary/description/content extrahieren -------
+# HTML -> Klartext
 
 class _SummaryExtractor(HTMLParser):
     def __init__(self):
@@ -71,12 +69,11 @@ class _SummaryExtractor(HTMLParser):
 
     def text(self):
         text = " ".join(self._parts)
-        # Whitespace normalisieren
         text = re.sub(r"\s+", " ", text).strip()
         return text
 
 def _raw_html_block(e) -> str:
-    # Reihenfolge: summary -> description -> content[0].value
+    # Reihenfolge
     if e.get("summary"):
         return e.get("summary") or ""
     if e.get("description"):
@@ -87,17 +84,17 @@ def _raw_html_block(e) -> str:
     return ""
 
 def _image_from_struct(e):
-    # 1) media_content
+
     if "media_content" in e:
         mc = e.get("media_content") or []
         if mc and mc[0].get("url"):
             return mc[0]["url"]
-    # 2) media_thumbnail
+        
     if "media_thumbnail" in e:
         mt = e.get("media_thumbnail") or []
         if mt and mt[0].get("url"):
             return mt[0]["url"]
-    # 3) enclosures
+
     if "enclosures" in e:
         for enc in e["enclosures"]:
             if enc.get("href") and enc.get("type","").startswith("image"):
@@ -122,8 +119,6 @@ def _summary_and_image(e):
         image = parser.image
 
     return text, image
-
-# -----------------------------------------------------------------------------------
 
 def fetch(feed_key:str, limit:int=20):
     if feed_key not in FEEDS:
